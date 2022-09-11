@@ -1,3 +1,4 @@
+import { } from 'miragejs';
 import { createContext, useEffect, useState, ReactNode } from 'react'
 import { api } from './services/api';
 
@@ -32,13 +33,22 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
             .then(response => setTransactions(response.data.transactions))
     }, []);
 
-    async function createTransaction(transaction: TransactionInput) {
-        await api.post('/transactions', transaction)
+    async function createTransaction(transactionInput: TransactionInput) {
+        const response = await api.post('/transactions', {
+            ...transactionInput,
+            createdAt: new Date(),
+        });
+        const { transaction } = response.data;
+
+        setTransactions([
+            ...transactions,
+            transaction
+        ]);
     }
 
     return (
         <TransactionsContext.Provider value={{ transactions, createTransaction }}>
             {children}
         </TransactionsContext.Provider>
-    )
+    );
 }
